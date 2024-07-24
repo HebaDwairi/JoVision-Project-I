@@ -30,7 +30,7 @@ const App = () =>{
     return(
         <NavigationContainer style={style.container}>
             <Tab.Navigator>
-                <Tab.Screen name="screen1" component={Screen1} />
+                <Tab.Screen name="Camera" component={Screen1} />
                 <Tab.Screen name="screen2" component={Screen2} />
                 <Tab.Screen name="screen3" component={Screen3} />
                 <Tab.Screen name="screen4" component={Screen4} />
