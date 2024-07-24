@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState ,useCallback} from 'react';
-import { View,Text,StyleSheet,Button,ActivityIndicator,TouchableOpacity} from 'react-native';
+import { View,Text,StyleSheet,Button,ActivityIndicator,TouchableOpacity,Image} from 'react-native';
 import {NavigationContainer, useIsFocused,useFocusEffect} from '@react-navigation/native';
-import { DocumentDirectoryPath, writeFile } from 'react-native-fs';
+import RNFS from 'react-native-fs';
 import { useCameraPermission,Camera, useCameraDevices,useCameraDevice,requestCameraPermission} from 'react-native-vision-camera';
 const App = ({navigation})=>{
     const device = useCameraDevice('back');
     const [showCamera,setShowCamera] = useState(true);
     const camera = useRef(null);
+    const [show,setshow] = useState(false);
+    const [src,setSrc] = useState('');
     useFocusEffect(
         useCallback(() => {
           setShowCamera(true);
@@ -23,8 +25,13 @@ const App = ({navigation})=>{
       },[]);
       const takeAPhoto = async()=>{
        const photo = await camera.current.takePhoto();
-       console.log(photo.path)
+       console.log(RNFS.DocumentDirectoryPath);
+       //setshow(true);
+       const oldPath = photo.path;
+       const newPath = RNFS.DocumentDirectoryPath + '/image1.jpg';
+       RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success!');}).catch((error)=>{console.log('err'+error);});
       }
+      
     return (
         <View style={StyleSheet.absoluteFill}>
             <Camera
@@ -35,6 +42,7 @@ const App = ({navigation})=>{
             photo={true}
             />
             <TouchableOpacity onPress={takeAPhoto} style={style.capture}></TouchableOpacity>
+            {show && <Image style={style.img} source={ { uri: "file:///data/user/0/com.project1/cache/mrousavy-3207401882513816704.jpg" }}/>}
         </View>
     );
 }
