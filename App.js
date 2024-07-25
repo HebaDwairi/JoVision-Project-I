@@ -31,7 +31,12 @@ const Screen4 = ({navigation})=>{
 const App = () =>{
     return(
         <NavigationContainer style={style.container}>
-            <Tab.Navigator>
+            <Tab.Navigator  screenOptions={{
+                tabBarActiveBackgroundColor:'#183D3D',
+                tabBarInactiveBackgroundColor:'#93B1A6',
+                tabBarActiveTintColor:'#ffffff',
+                tabBarInactiveTintColor:'gray',
+            }}>
                 <Tab.Screen name="Camera" component={Screen1} />
                 <Tab.Screen name="screen2" component={Screen2} />
                 <Tab.Screen name="screen3" component={Screen3} />
