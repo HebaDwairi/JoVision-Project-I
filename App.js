@@ -1,23 +1,21 @@
 import React from 'react';
-import { View,Text,StyleSheet,Button,Image} from 'react-native';
+import { View,Text,StyleSheet,Image} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Screen1 from './Components/screen1';
+import Screen3 from './Components/screen3';
 import RNFS from 'react-native-fs';
+import { persistor,store } from './redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
+
 const Tab = createBottomTabNavigator();
 
 const Screen2 = ({navigation})=>{
     return(
         <View style={style.container}>
             <Text style={style.text}>Screen two</Text>
-            <Image style={style.img} source={{ uri: 'file://'+RNFS.DocumentDirectoryPath + '/image1.jpg'}}/>
-        </View>
-    );
-}
-const Screen3 = ({navigation})=>{
-    return(
-        <View style={style.container}>
-            <Text style={style.text}>Screen three</Text>
+            <Image style={style.img} source={{ uri: 'file://'+RNFS.DocumentDirectoryPath + '/image0.jpg'}}/>
         </View>
     );
 }
@@ -30,19 +28,24 @@ const Screen4 = ({navigation})=>{
 }
 const App = () =>{
     return(
-        <NavigationContainer style={style.container}>
-            <Tab.Navigator  screenOptions={{
-                tabBarActiveBackgroundColor:'#183D3D',
-                tabBarInactiveBackgroundColor:'#93B1A6',
-                tabBarActiveTintColor:'#ffffff',
-                tabBarInactiveTintColor:'gray',
-            }}>
-                <Tab.Screen name="Camera" component={Screen1} />
-                <Tab.Screen name="screen2" component={Screen2} />
-                <Tab.Screen name="screen3" component={Screen3} />
-                <Tab.Screen name="screen4" component={Screen4} />
-            </Tab.Navigator>
-        </NavigationContainer>
+        <Provider store={store}>
+            <PersistGate persistor={persistor}>
+                <NavigationContainer style={style.container}>
+                <Tab.Navigator  screenOptions={{
+                    tabBarActiveBackgroundColor:'#183D3D',
+                    tabBarInactiveBackgroundColor:'#93B1A6',
+                    tabBarActiveTintColor:'#ffffff',
+                    tabBarInactiveTintColor:'gray',
+                }}>
+                    <Tab.Screen name="Camera" component={Screen1} />
+                    <Tab.Screen name="screen2" component={Screen2} />
+                    <Tab.Screen name="Gallery" component={Screen3} />
+                    <Tab.Screen name="screen4" component={Screen4} />
+                </Tab.Navigator>
+            </NavigationContainer>
+            </PersistGate>
+            
+        </Provider>
     );
 }
 const style = StyleSheet.create({

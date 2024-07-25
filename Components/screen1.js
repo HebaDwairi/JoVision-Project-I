@@ -4,15 +4,30 @@ import {useFocusEffect} from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 import { Camera,useCameraDevice} from 'react-native-vision-camera';
 import CustomAlert from './CustomAlert';
+import { useSelector, useDispatch } from 'react-redux';
+import { addImage, removeImage } from '../redux/actions';
+
 const App = ({navigation})=>{
     const device = useCameraDevice('back');
     const [showCamera,setShowCamera] = useState(true);
     const camera = useRef(null);
     const [showPreview,setShowPreview] = useState(false);
     const [src,setSrc] = useState('');
-    const [imageNum, setImageNum] = useState(1);
+    const images = useSelector((state)=>state.images);
+    const number = useSelector((state)=>state.number);
+    const dispatch = useDispatch();
+
     const discardImage = ()=>{
-      
+      setShowPreview(false);
+    }
+    const saveImage = ()=>{
+      setShowPreview(false);
+      const img = {
+        id: number,
+        src: RNFS.DocumentDirectoryPath + '/image'+number+'.jpg',
+      }
+      dispatch(addImage(img));
+      console.log(images);
     }
     const AlertContent = () =>{
       return(
@@ -20,7 +35,7 @@ const App = ({navigation})=>{
           <Image style={style.img} source={src}></Image>
           {console.log(src)}
           <View style={style.btnContainer}>
-            <TouchableOpacity  style={style.btn} onPress={()=>{setShowPreview(false)}}><Text style={style.text}>Save</Text></TouchableOpacity>
+            <TouchableOpacity  style={style.btn} onPress={saveImage}><Text style={style.text}>Save</Text></TouchableOpacity>
             <TouchableOpacity style={style.btn} onPress={discardImage}><Text  style={style.text}>Discard</Text></TouchableOpacity>
           </View>
         </View>
@@ -35,6 +50,7 @@ const App = ({navigation})=>{
         }, [])
     );
     useEffect(()=>{
+      console.log(images);
       const checkCameraPermission = async () => {
           const permission = Camera.requestCameraPermission();
         };
@@ -43,7 +59,7 @@ const App = ({navigation})=>{
 
     const confirmPhoto = (path)=>{
         const oldPath = path;
-        const newPath = RNFS.DocumentDirectoryPath + '/image1.jpg';
+        const newPath = RNFS.DocumentDirectoryPath + '/image'+number+'.jpg';
         RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success!');}).catch((error)=>{console.log('err'+error);});
         setSrc({ uri: 'file://'+path});
         setShowPreview(true);
