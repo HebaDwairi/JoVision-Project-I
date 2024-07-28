@@ -8,7 +8,7 @@ const reducer = (state = initialState ,action) => {
         case ADD:
             return{
                 ...state,
-                images: [...state.images,action.payload],
+                images: [action.payload,...state.images],
                 number: state.number+1,
             };
         case REMOVE:

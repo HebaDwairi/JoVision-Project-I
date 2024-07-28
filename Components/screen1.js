@@ -7,7 +7,7 @@ import CustomAlert from './CustomAlert';
 import { useSelector, useDispatch } from 'react-redux';
 import { addImage, removeImage } from '../redux/actions';
 
-const App = ({navigation})=>{
+const App = ()=>{
     const device = useCameraDevice('back');
     const [showCamera,setShowCamera] = useState(true);
     const camera = useRef(null);
@@ -21,19 +21,24 @@ const App = ({navigation})=>{
       setShowPreview(false);
     }
     const saveImage = ()=>{
+      //save image to device
+      const oldPath = src;
+      const newPath = RNFS.DocumentDirectoryPath + '/image'+number+'.jpg';
+      RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success');}).catch((error)=>{console.log('err'+error);});
+
+      // add image to state
       setShowPreview(false);
       const img = {
         id: number,
         src: RNFS.DocumentDirectoryPath + '/image'+number+'.jpg',
       }
       dispatch(addImage(img));
-      console.log(images);
     }
+
     const AlertContent = () =>{
       return(
         <View style={style.container}>
-          <Image style={style.img} source={src}></Image>
-          {console.log(src)}
+          <Image style={style.img} source={{ uri: 'file://'+src}}></Image>
           <View style={style.btnContainer}>
             <TouchableOpacity  style={style.btn} onPress={saveImage}><Text style={style.text}>Save</Text></TouchableOpacity>
             <TouchableOpacity style={style.btn} onPress={discardImage}><Text  style={style.text}>Discard</Text></TouchableOpacity>
@@ -57,18 +62,11 @@ const App = ({navigation})=>{
         checkCameraPermission();
     },[]);
 
-    const confirmPhoto = (path)=>{
-        const oldPath = path;
-        const newPath = RNFS.DocumentDirectoryPath + '/image'+number+'.jpg';
-        RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success!');}).catch((error)=>{console.log('err'+error);});
-        setSrc({ uri: 'file://'+path});
-        setShowPreview(true);
-    }
-
     const takeAPhoto = async()=>{
       try{
         const photo = await camera.current.takePhoto();
-        confirmPhoto(photo.path);
+        setShowPreview(true);
+        setSrc(photo.path);
       }
       catch(err){
         console.log('error while taking a photo' + err);
