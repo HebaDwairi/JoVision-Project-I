@@ -24,6 +24,7 @@ const App = ()=>{
         const subscription = accelerometer.subscribe((data) =>{
             setOrientation(data); }    
         );
+        loc();
         setInterval(loc,10000);
         return () => {
             subscription.unsubscribe();

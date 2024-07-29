@@ -3,19 +3,23 @@ import { View,Text,StyleSheet,TouchableOpacity,Image} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import RNFS from 'react-native-fs';
 import { Camera,useCameraDevice} from 'react-native-vision-camera';
-import CustomAlert from './CustomAlert';
+import CustomAlert from '../CustomAlert';
 import { useSelector, useDispatch } from 'react-redux';
-import { addImage, removeImage } from '../redux/actions';
+import { addImage } from '../../redux/actions';
+//import Icon from 'react-native-vector-icons/FontAwesome';
 
 const App = ()=>{
-    const device = useCameraDevice('back');
+   
     const [showCamera,setShowCamera] = useState(true);
-    const camera = useRef(null);
     const [showPreview,setShowPreview] = useState(false);
     const [src,setSrc] = useState('');
-    const images = useSelector((state)=>state.images);
+    const [cameraType, setCameraType] = useState('back');
+    const [mode, setMode] = useState('photo');
+    const device = useCameraDevice(cameraType);
     const number = useSelector((state)=>state.number);
     const dispatch = useDispatch();
+    const camera = useRef(null);
+    const recordBtnRef = useRef(null);
 
     const discardImage = ()=>{
       setShowPreview(false);
@@ -72,7 +76,40 @@ const App = ()=>{
         console.log('error while taking a photo' + err);
       }
     }
-      
+    const takeAVideo = async()=>{
+      try{
+        camera.current.startRecording({
+          onRecordingFinished: (video) => console.log(video),
+          onRecordingError: (error) => console.error(error)
+        })
+      }
+      catch(err){
+        console.log('error while taking a photo' + err);
+      }
+    }
+    const stopRecording = async () =>{
+      await camera.current.stopRecording();
+    }
+
+    const capture = ()=>{
+      if(mode == 'photo'){
+        takeAPhoto();
+      }
+      else if (mode == 'video'){
+        setMode('recording');
+        takeAVideo();
+      }
+      else if(mode == 'recording'){
+        stopRecording();
+        setMode('video');
+      }
+    }
+    const changeCamera =()=>{
+      cameraType == 'back'? setCameraType('front') : setCameraType('back');
+    }
+    const changeMode=()=>{
+      mode == 'photo'? setMode('video') : setMode('photo');
+    }
     return (
         <View style={StyleSheet.absoluteFill}>
             <Camera
@@ -81,22 +118,25 @@ const App = ()=>{
             isActive={showCamera}
             ref={camera}
             photo={true}
+            video={true}
             />
-            <TouchableOpacity onPress={takeAPhoto} style={style.capture}></TouchableOpacity>
+            <TouchableOpacity ref={recordBtnRef} onPress={capture} style={style.capture}></TouchableOpacity>
+            <TouchableOpacity onPress={changeCamera} style={style.switch}><Text style={style.text}>switch</Text></TouchableOpacity>
+            <TouchableOpacity onPress={changeMode} style={style.mode}><Text style={style.text}>{mode}</Text></TouchableOpacity>
             <CustomAlert show={showPreview} setShow={setShowPreview} content={<AlertContent src={src}/>}/> 
         </View>
     );
 }
 const style = StyleSheet.create({
     container:{
-      backgroundColor:'#5C8374',
+      backgroundColor:'#355c5c',
       padding:20,
       borderRadius:20,
 
     },
     text:{
         fontSize:18,
-        color:'#ffffff',
+        color:'white',
         alignSelf:'center'
     },
     capture:{
@@ -128,6 +168,30 @@ const style = StyleSheet.create({
       padding:8,
       width:100,
       borderRadius:10,
+    },
+    switch:{
+      backgroundColor:'white',
+      left:10,
+      position:'absolute',
+      bottom:20,
+      padding:10,
+      borderRadius:50,
+      width:95,
+      borderWidth:6,
+      borderColor:'gray',
+      opacity:0.8,
+    },
+    mode:{
+      backgroundColor:'white',
+      right:10,
+      position:'absolute',
+      bottom:20,
+      padding:10,
+      borderRadius:50,
+      width:95,
+      borderWidth:6,
+      borderColor:'gray',
+      opacity:0.8,
     }
 });
 export default App;
