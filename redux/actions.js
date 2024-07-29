@@ -1,12 +1,12 @@
 export const ADD = 'ADD';
 export const REMOVE ='REMOVE';
 
-export const addImage = (imgData) => ({
+export const addMedia = (data) => ({
     type: ADD,
-    payload: imgData
+    payload: data
 });
 
-export const removeImage = (index) => ({
+export const removeMedia = (index) => ({
     type: REMOVE,
     payload: index
 });

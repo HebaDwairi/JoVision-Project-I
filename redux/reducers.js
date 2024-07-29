@@ -1,6 +1,6 @@
 import { ADD, REMOVE } from "./actions";
 const initialState = {
-    images : [],
+    media : [],
     number:0,
 }
 const reducer = (state = initialState ,action) => {
@@ -8,13 +8,13 @@ const reducer = (state = initialState ,action) => {
         case ADD:
             return{
                 ...state,
-                images: [action.payload,...state.images],
+                media: [action.payload,...state.media],
                 number: state.number+1,
             };
         case REMOVE:
             return{
                 ...state,
-                images: state.images.filter((item,index)=>index!==action.payload)
+                media: state.media.filter((item,index)=>index!==action.payload)
             };
         default: return state;
     }

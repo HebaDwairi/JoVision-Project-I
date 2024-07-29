@@ -5,8 +5,8 @@ import RNFS from 'react-native-fs';
 import { Camera,useCameraDevice} from 'react-native-vision-camera';
 import CustomAlert from '../CustomAlert';
 import { useSelector, useDispatch } from 'react-redux';
-import { addImage } from '../../redux/actions';
-//import Icon from 'react-native-vector-icons/FontAwesome';
+import { addMedia } from '../../redux/actions';
+import Icon from 'react-native-vector-icons/Entypo';
 
 const App = ()=>{
    
@@ -17,6 +17,7 @@ const App = ()=>{
     const [mode, setMode] = useState('photo');
     const device = useCameraDevice(cameraType);
     const number = useSelector((state)=>state.number);
+    const media = useSelector((state)=>state.media);
     const dispatch = useDispatch();
     const camera = useRef(null);
     const recordBtnRef = useRef(null);
@@ -26,17 +27,20 @@ const App = ()=>{
     }
     const saveImage = ()=>{
       //save image to device
+      const d = new Date().toISOString();
+      const date = d.replace(/[:.-]/g,'_');
       const oldPath = src;
-      const newPath = RNFS.DocumentDirectoryPath + '/image'+number+'.jpg';
+      const newPath = RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.jpg';
       RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success');}).catch((error)=>{console.log('err'+error);});
 
       // add image to state
       setShowPreview(false);
       const img = {
         id: number,
-        src: RNFS.DocumentDirectoryPath + '/image'+number+'.jpg',
+        src: RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.jpg',
+        type:'image',
       }
-      dispatch(addImage(img));
+      dispatch(addMedia(img));
     }
 
     const AlertContent = () =>{
@@ -59,7 +63,7 @@ const App = ()=>{
         }, [])
     );
     useEffect(()=>{
-      //console.log(images);
+      console.log(media);
       const checkCameraPermission = async () => {
       const permission = Camera.requestCameraPermission();
       };
@@ -77,15 +81,24 @@ const App = ()=>{
       }
     }
     const takeAVideo = async()=>{
-      try{
         camera.current.startRecording({
-          onRecordingFinished: (video) => console.log(video),
+          onRecordingFinished: (video) => {
+           // console.log(video);
+            const d = new Date().toISOString();
+            const date = d.replace(/[:.-]/g,'_');
+            console.log(date);
+            const oldPath = video.path;
+            const newPath = RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.mp4';
+            RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success');}).catch((error)=>{console.log('err'+error);});
+            const vid = {
+              id : number,
+              src:RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.mp4',
+              type:'video',
+            }
+            dispatch(addMedia(vid));
+          },
           onRecordingError: (error) => console.error(error)
-        })
-      }
-      catch(err){
-        console.log('error while taking a photo' + err);
-      }
+        });
     }
     const stopRecording = async () =>{
       await camera.current.stopRecording();
@@ -119,6 +132,7 @@ const App = ()=>{
             ref={camera}
             photo={true}
             video={true}
+            audio={false}
             />
             <TouchableOpacity ref={recordBtnRef} onPress={capture} style={style.capture}></TouchableOpacity>
             <TouchableOpacity onPress={changeCamera} style={style.switch}><Text style={style.text}>switch</Text></TouchableOpacity>
@@ -132,7 +146,6 @@ const style = StyleSheet.create({
       backgroundColor:'#355c5c',
       padding:20,
       borderRadius:20,
-
     },
     text:{
         fontSize:18,

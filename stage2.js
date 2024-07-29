@@ -38,7 +38,7 @@ const App = () =>{
                     <Tab.Screen name="Camera" component={Screen1} />
                     <Tab.Screen name="Sensors" component={Screen2} />
                     <Tab.Screen name="Gallery" component={Screen3} />
-                    <Tab.Screen name="Slideshow" component={Screen4} />
+                    <Tab.Screen name="Media Player" component={Screen4} />
                 </Tab.Navigator>
             </NavigationContainer>
             </PersistGate>

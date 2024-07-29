@@ -1,10 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View,Text,StyleSheet,Image,FlatList,TouchableOpacity} from 'react-native';
 import { useSelector} from 'react-redux';
-const Item = ({src})=>{
+import Video from 'react-native-video';
+const Item = ({item})=>{
+
     return(
         <View>
-            <Image style={style.img} source={{ uri: 'file://'+src}}/>
+            {item.type == 'image' ? 
+            <Image style={style.img} source={{ uri: 'file://'+item.src}}/>:
+            <Video
+            source={{ uri: 'file://'+item.src}}
+            controls={true}
+            style={style.img}
+            paused={false}/>  }  
         </View>
     );
 }
@@ -12,9 +20,9 @@ const Item = ({src})=>{
 let index = 0;
 const App = ()=>{
     const [isPaused,setIsPaused] = useState(false);
-    const images = useSelector((state)=> state.images);
+    const media = useSelector((state)=> state.media);
     const flatListRef = useRef(null);
-    const maxNum = images.length;
+    const maxNum = media.length;
     const Scroll = () => {
         let interval;
         if(!isPaused){
@@ -37,13 +45,13 @@ const App = ()=>{
     }
     return(
         <View style={style.container}>
-            <Scroll/>
+            
             <FlatList
-            data={images}
-            renderItem={({item})=><Item src={item.src}/>}
+            data={media}
+            renderItem={({item})=><Item item={item}/>}
             horizontal={true}
             ref={flatListRef}
-            scrollEnabled={false}>
+            scrollEnabled={true}>
             </FlatList> 
         </View>
     );
