@@ -12,7 +12,7 @@ const Item = ({src})=>{
 let index = 0;
 const App = ()=>{
     const [isPaused,setIsPaused] = useState(false);
-    const images = useSelector((state)=> state.images);
+    const images = useSelector((state)=> state.media);
     const flatListRef = useRef(null);
     const maxNum = images.length;
     const Scroll = () => {
@@ -24,7 +24,7 @@ const App = ()=>{
                 if(index == maxNum){
                     index=0;
                 }        
-            }, 1500);
+            }, 1000);
         }
         
         return(

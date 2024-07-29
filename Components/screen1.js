@@ -5,7 +5,7 @@ import RNFS from 'react-native-fs';
 import { Camera,useCameraDevice} from 'react-native-vision-camera';
 import CustomAlert from './CustomAlert';
 import { useSelector, useDispatch } from 'react-redux';
-import { addImage, removeImage } from '../redux/actions';
+import { addMedia } from '../redux/actions';
 
 const App = ()=>{
     const device = useCameraDevice('back');
@@ -31,8 +31,9 @@ const App = ()=>{
       const img = {
         id: number,
         src: RNFS.DocumentDirectoryPath + '/image'+number+'.jpg',
+        type:'image',
       }
-      dispatch(addImage(img));
+      dispatch(addMedia(img));
     }
 
     const AlertContent = () =>{
@@ -55,7 +56,7 @@ const App = ()=>{
         }, [])
     );
     useEffect(()=>{
-      //console.log(images);
+      console.log(images);
       const checkCameraPermission = async () => {
       const permission = Camera.requestCameraPermission();
       };

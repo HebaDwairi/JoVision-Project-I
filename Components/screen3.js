@@ -10,7 +10,7 @@ const Item = ({src})=>{
 }
 
 const App = ()=>{
-    const images = useSelector((state)=> state.images);
+    const images = useSelector((state)=> state.media);
     return(
         <View>
             <FlatList

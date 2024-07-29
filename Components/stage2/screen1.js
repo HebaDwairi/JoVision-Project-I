@@ -20,7 +20,6 @@ const App = ()=>{
     const media = useSelector((state)=>state.media);
     const dispatch = useDispatch();
     const camera = useRef(null);
-    const recordBtnRef = useRef(null);
 
     const discardImage = ()=>{
       setShowPreview(false);
@@ -134,7 +133,7 @@ const App = ()=>{
             video={true}
             audio={false}
             />
-            <TouchableOpacity ref={recordBtnRef} onPress={capture} style={style.capture}></TouchableOpacity>
+            <TouchableOpacity  onPress={capture} style={style.capture}></TouchableOpacity>
             <TouchableOpacity onPress={changeCamera} style={style.switch}><Text style={style.text}>switch</Text></TouchableOpacity>
             <TouchableOpacity onPress={changeMode} style={style.mode}><Text style={style.text}>{mode}</Text></TouchableOpacity>
             <CustomAlert show={showPreview} setShow={setShowPreview} content={<AlertContent src={src}/>}/> 
