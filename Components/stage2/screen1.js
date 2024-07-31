@@ -19,40 +19,19 @@ const App = ()=>{
     const dispatch = useDispatch();
     const camera = useRef(null);
 
-    const discardImage = ()=>{
+    const saveMedia = (oldPath,type) => {
       setShowPreview(false);
-    }
-    const saveImage = ()=>{
-      //save image to device
-      const d = new Date().toISOString();
-      console.log(d);
-      const date = d.replace(/[:.-]/g,'_');
-      console.log(date);
-      const oldPath = src;
-      const newPath = RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.jpg';
-      RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success');}).catch((error)=>{console.log('err'+error);});
-      // add image to state
-      setShowPreview(false);
-      const img = {
-        id: number,
-        src: RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.jpg',
-        type:'image',
-      }
-      dispatch(addMedia(img));
-    }
-
-    const saveVideo = (video) =>{
       const d = new Date().toISOString();
       const date = d.replace(/[:.-]/g,'_');
-      const oldPath = video.path;
-      const newPath = RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.mp4';
-      RNFS.copyFile(oldPath,newPath).then(()=>{console.log('success');}).catch((error)=>{console.log('err'+error);});
-      const vid = {
+      const ext = type == 'image'? '.jpg': '.mp4';
+      const newPath = RNFS.DocumentDirectoryPath + '/Hebatullah_'+ date + ext;
+      RNFS.copyFile(oldPath,newPath).then(()=>{console.log('file saved')}).catch((error)=>{console.log(error)});
+      const file = {
         id : number,
-        src:RNFS.DocumentDirectoryPath + '/Hebatullah_'+date+'.mp4',
-        type:'video',
+        src: newPath,
+        type: type,
       }
-      dispatch(addMedia(vid));
+      dispatch(addMedia(file));
     }
 
     const AlertContent = () =>{
@@ -60,8 +39,8 @@ const App = ()=>{
         <View style={style.container}>
           <Image style={style.img} source={{ uri: 'file://'+src}}></Image>
           <View style={style.btnContainer}>
-            <TouchableOpacity  style={style.btn} onPress={saveImage}><Text style={style.text}>Save</Text></TouchableOpacity>
-            <TouchableOpacity style={style.btn} onPress={discardImage}><Text  style={style.text}>Discard</Text></TouchableOpacity>
+            <TouchableOpacity  style={style.btn} onPress={()=>{saveMedia(src,'image')}}><Text style={style.text}>Save</Text></TouchableOpacity>
+            <TouchableOpacity style={style.btn} onPress={()=>{setShowPreview(false)}}><Text  style={style.text}>Discard</Text></TouchableOpacity>
           </View>
         </View>
       );
@@ -95,7 +74,7 @@ const App = ()=>{
     const takeAVideo = async()=>{
         camera.current.startRecording({
           onRecordingFinished: (video) => {
-            saveVideo(video);
+            saveMedia(video.path, 'video');
           },
           onRecordingError: (error) => console.error(error),
         });
