@@ -1,4 +1,4 @@
-import { ADD, REMOVE } from "./actions";
+import { ADD, REMOVE, RENAME } from "./actions";
 const initialState = {
     media : [],
     number:0,
@@ -15,6 +15,12 @@ const reducer = (state = initialState ,action) => {
             return{
                 ...state,
                 media: state.media.filter((item,index)=>index!==action.payload)
+            };
+        case RENAME:
+            return{
+                ...state,
+                media: state.media.map((item,index)=> index === action.payload.index? 
+                {...item, src : action.payload.newSrc} : item)
             };
         default: return state;
     }
