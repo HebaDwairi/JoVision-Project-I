@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { View,Text,StyleSheet,TextInput,Image,FlatList,TouchableOpacity,Alert} from 'react-native';
+import { View,Text,StyleSheet,TextInput,Image,FlatList,TouchableOpacity,Alert, Pressable} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import CustomAlert from '../CustomAlert';
 import RNFS from 'react-native-fs';
@@ -43,7 +43,9 @@ const App = ()=>{
     }
 
     const deleteFile = () => {
-        
+        setShow(false);
+        RNFS.unlink(source.src).then(console.log('deleted')).catch((err)=>console.log(err));
+        dispatch(removeMedia(index));
     }
     const displayFile = () => {
         
@@ -67,9 +69,9 @@ const App = ()=>{
     const Item = ({src,index})=>{
         return(
             <View>
-                <TouchableOpacity onPress={()=>{setShow(!show); setSource(src); setIndex(index)}}>
+                <Pressable onPress={()=>{setShow(!show); setSource(src); setIndex(index)}}>
                     <Image style={style.img} source={{ uri: 'file://'+src.src}}/>
-                </TouchableOpacity>
+                </Pressable>
             </View>
         );
     }
@@ -78,7 +80,7 @@ const App = ()=>{
             <FlatList
             data={media}
             renderItem={({item,index})=><Item src={item} index={index}/>}
-            numColumns={1}>
+            numColumns={2}>
             </FlatList>
             <CustomAlert show={show} setShow={setShow} content={showRename? <RenameDialog/> : <AlertContent/>}/>
          
@@ -87,8 +89,8 @@ const App = ()=>{
 }
 const style = StyleSheet.create({
     img:{
-        width:350,
-        height:420,
+        width:176,
+        height:176,
         alignSelf:'center',
         margin:10,
         borderRadius:10,
