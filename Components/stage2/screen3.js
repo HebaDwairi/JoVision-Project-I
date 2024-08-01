@@ -5,7 +5,19 @@ import CustomAlert from '../CustomAlert';
 import RNFS from 'react-native-fs';
 import { addMedia, removeMedia,renameMedia } from '../../redux/actions';
 
-const App = ()=>{
+const RenameDialog = ({source,renameFile})=>{
+    const [name,setName] = useState('');
+    return(
+        <View style={style.alert}>
+            <Text style={style.text}>Current name: {source.src.substring(32)}</Text>
+            <TextInput  style= {style.input} onChangeText={setName} placeholder='new name'/>
+            <TouchableOpacity onPress={()=>{renameFile(name)}}>
+                <Text style={style.text} >confirm</Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
+const App = ({navigation})=>{
     const media = useSelector((state)=> state.media);
     const [show, setShow] = useState(false);
     const [showRename, setShowRename] = useState(false);
@@ -13,7 +25,7 @@ const App = ()=>{
     const [index,setIndex] =useState(0);
     const dispatch = useDispatch();
 
-    const renameFile =  (name)=>{
+    const renameFile = (name)=>{
         const ext = source.type === 'image' ? '.jpg' : '.mp4'; 
         const newPath = RNFS.DocumentDirectoryPath +'/'+ name + ext; 
         RNFS.exists(newPath).then((exist)=>{
@@ -22,26 +34,12 @@ const App = ()=>{
             }
             else{
                RNFS.moveFile(source.src, newPath).then(console.log('renamed')).catch((err)=>{console.log(err)});
-               console.log(newPath);
                dispatch(renameMedia(index,newPath));       
             }
             setShow(false);
             setShowRename(false);
         })
     }
-    const RenameDialog = ()=>{
-        const [name,setName] = useState('');
-        return(
-            <View style={style.alert}>
-                <Text style={style.text}>Current name: {source.src.substring(32)}</Text>
-                <TextInput  style= {style.input} onChangeText={setName} placeholder='new name'/>
-                <TouchableOpacity onPress={()=>{renameFile(name)}}>
-                    <Text style={style.text} >confirm</Text>
-                </TouchableOpacity>
-            </View>
-        );
-    }
-
     const deleteFile = () => {
         setShow(false);
         RNFS.unlink(source.src).then(console.log('deleted')).catch((err)=>console.log(err));
@@ -60,7 +58,7 @@ const App = ()=>{
                 <TouchableOpacity onPress={deleteFile}>
                     <Text style={style.text}>Delete</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={displayFile}>
+                <TouchableOpacity onPress={() => {navigation.navigate('media player',{index:index}); setShow(false)}}>
                     <Text style={style.text}>Fullscreen</Text>
                 </TouchableOpacity>
             </View>
@@ -82,7 +80,8 @@ const App = ()=>{
             renderItem={({item,index})=><Item src={item} index={index}/>}
             numColumns={2}>
             </FlatList>
-            <CustomAlert show={show} setShow={setShow} content={showRename? <RenameDialog/> : <AlertContent/>}/>
+            <CustomAlert show={show} setShow={setShow}
+             content={showRename? <RenameDialog source={source} renameFile={renameFile}/> : <AlertContent/>}/>
          
         </View>
     );

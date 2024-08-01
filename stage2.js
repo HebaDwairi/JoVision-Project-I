@@ -9,9 +9,10 @@ import Screen2 from './Components/stage2/screen2';
 import { persistor,store } from './redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Tab = createBottomTabNavigator();
-
+const Stack  =createNativeStackNavigator();
 
 const MyTheme = {
     dark: true,
@@ -24,25 +25,33 @@ const MyTheme = {
       notification: 'rgb(255, 69, 58)',
     },
   };
+
+function Tabs() {
+return (
+    <Tab.Navigator  screenOptions={{
+        tabBarActiveBackgroundColor:'#183D3D',
+        tabBarInactiveBackgroundColor:'#355c5c',
+        tabBarActiveTintColor:'#ffffff',
+        tabBarInactiveTintColor:'gray',
+    }}>
+        <Tab.Screen name="Camera" component={Screen1} />
+        <Tab.Screen name="Sensors" component={Screen2} />
+        <Tab.Screen name="Gallery" component={Screen3} />
+      
+    </Tab.Navigator>
+);
+}
 const App = () =>{
     return(
         <Provider store={store}>
             <PersistGate persistor={persistor}>
                 <NavigationContainer theme={MyTheme}>
-                <Tab.Navigator  screenOptions={{
-                    tabBarActiveBackgroundColor:'#183D3D',
-                    tabBarInactiveBackgroundColor:'#355c5c',
-                    tabBarActiveTintColor:'#ffffff',
-                    tabBarInactiveTintColor:'gray',
-                }}>
-                    <Tab.Screen name="Camera" component={Screen1} />
-                    <Tab.Screen name="Sensors" component={Screen2} />
-                    <Tab.Screen name="Gallery" component={Screen3} />
-                    <Tab.Screen name="Media Player" component={Screen4} />
-                </Tab.Navigator>
-            </NavigationContainer>
+                    <Stack.Navigator >
+                        <Stack.Screen component={Tabs} name='tabs' options={{headerShown: false}}></Stack.Screen>
+                        <Stack.Screen component={Screen4} name='media player'></Stack.Screen>
+                    </Stack.Navigator>
+                </NavigationContainer>
             </PersistGate>
-            
         </Provider>
     );
 }
@@ -63,3 +72,20 @@ const style = StyleSheet.create({
 });
 
 export default App;
+
+
+/*
+<NavigationContainer theme={MyTheme}>
+                    <Tab.Navigator  screenOptions={{
+                        tabBarActiveBackgroundColor:'#183D3D',
+                        tabBarInactiveBackgroundColor:'#355c5c',
+                        tabBarActiveTintColor:'#ffffff',
+                        tabBarInactiveTintColor:'gray',
+                    }}>
+                        <Tab.Screen name="Camera" component={Screen1} />
+                        <Tab.Screen name="Sensors" component={Screen2} />
+                        <Tab.Screen name="Gallery" component={Screen3} />
+                        <Tab.Screen name="Media Player" component={Screen4} />
+                    </Tab.Navigator>
+                </NavigationContainer>
+                 */

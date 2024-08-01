@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState,useCallback } from 'react';
 import { View,Text,StyleSheet,Image,FlatList,TouchableOpacity} from 'react-native';
 import { useSelector} from 'react-redux';
 import Video from 'react-native-video';
+import { useFocusEffect } from '@react-navigation/native';
 const Item = ({item})=>{
 
     return(
@@ -17,58 +18,52 @@ const Item = ({item})=>{
     );
 }
 
-let index = 0;
-const App = ()=>{
+const App = ({route, navigation})=>{
     const [isPaused,setIsPaused] = useState(false);
     const media = useSelector((state)=> state.media);
     const flatListRef = useRef(null);
     const maxNum = media.length;
-    const Scroll = () => {
-        let interval;
-        if(!isPaused){
-            interval =  setInterval(() => {
-                flatListRef.current.scrollToIndex({animated:true, index:index});
-                index++;
-                if(index == maxNum){
-                    index=0;
-                }        
-            }, 1500);
-        }
-        
-        return(
-            <View style={style.btnContainer}>
-                <TouchableOpacity onPress={()=>{setIsPaused(!isPaused); clearInterval(interval)}}>
-                <Text style={style.text}>{isPaused?'Resume':'Pause'}</Text>
-            </TouchableOpacity>
-            </View>
-        );
-    }
+    const index = route.params.index;
+    const scroll = () => {
+        flatListRef.current.scrollToIndex({animated:false, index:index}); 
+        console.log( route.params.index)
+       }
+    useFocusEffect(
+       useCallback(() => {
+        console.log('scrrooo')
+        scroll();
+       }, [])
+    );
+    
     return(
         <View style={style.container}>
-            
             <FlatList
             data={media}
             renderItem={({item})=><Item item={item}/>}
             horizontal={true}
             ref={flatListRef}
-            scrollEnabled={true}>
+            scrollEnabled={true}
+            getItemLayout ={(data, index) => ({
+                length: 700,
+                offset: 393 * index,
+                index
+              })} >
             </FlatList> 
         </View>
     );
 }
 const style = StyleSheet.create({
     img:{
-        width:373,
+        width:392,
         height:700,
         alignSelf:'center',
-        margin:10,
-        borderRadius:10,
+        marginHorizontal:1,
     },
     container:{
         backgroundColor:'#183D3D',
     },
     text:{
-        fontSize:25,
+        fontSize:20,
         alignSelf:'center',
 
     },
