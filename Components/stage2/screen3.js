@@ -45,9 +45,6 @@ const App = ({navigation})=>{
         RNFS.unlink(source.src).then(console.log('deleted')).catch((err)=>console.log(err));
         dispatch(removeMedia(index));
     }
-    const displayFile = () => {
-        
-    }
 
     const AlertContent = ()=>{
         return(

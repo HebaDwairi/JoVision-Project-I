@@ -34,7 +34,7 @@ const App = ()=>{
         else if(speed < Y){
             setImage(images.sitting);
         }
-        console.log(location);
+        //console.log(location);
     }
     useEffect(()=>{
         const subscription = accelerometer.subscribe((data) =>{

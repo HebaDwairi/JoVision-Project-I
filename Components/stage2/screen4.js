@@ -4,12 +4,24 @@ import { useSelector} from 'react-redux';
 import Video from 'react-native-video';
 import { useFocusEffect } from '@react-navigation/native';
 
-const VideoItem = ({item, ref}) =>{
-    const move = (dir)=>{
-        if(dir == 'l'){
-            
+const move = (dir,list)=>{
+    if(dir == 'l'){ 
+        if(list.currentIndex > 0 ){
+            list.ref.current.scrollToIndex({animated:true, index: list.currentIndex-1});
+            list.setCurrentIndex(list.currentIndex-1);
+        }
+       console.log(list.currentIndex)
+    }
+    else if(dir == 'r'){
+        console.log(list.currentIndex)
+        if(list.currentIndex < list.length -1){
+            list.setCurrentIndex(list.currentIndex+1);
+            list.ref.current.scrollToIndex({animated:true, index: list.currentIndex+1}); 
         }
     }
+}
+
+const VideoItem = ({item, list}) =>{
     return(
         <View>
             <Video
@@ -18,11 +30,11 @@ const VideoItem = ({item, ref}) =>{
             style={style.img}
             />
             <View style={style.imageControls}>
-                <TouchableOpacity style={style.btn} onPress={move('l')}><Text style={style.text}>{'<<'}</Text></TouchableOpacity>
+                <TouchableOpacity style={style.btn} onPress={()=>{move('l',list)}}><Text style={style.text}>{'<<'}</Text></TouchableOpacity>
                 <TouchableOpacity style={style.btn}><Text style={style.text}>-5</Text></TouchableOpacity>
                 <TouchableOpacity style={style.btn}><Text style={style.text}>play</Text></TouchableOpacity>
                 <TouchableOpacity style={style.btn}><Text style={style.text}>+5</Text></TouchableOpacity>
-                <TouchableOpacity style={style.btn} onPress={move('r')}><Text style={style.text}>{'>>'}</Text></TouchableOpacity>
+                <TouchableOpacity style={style.btn} onPress={()=>{move('r',list)}}><Text style={style.text}>{'>>'}</Text></TouchableOpacity>
             </View>
         </View>
         
@@ -30,44 +42,49 @@ const VideoItem = ({item, ref}) =>{
     );
 }
 
-const ImageItem = ({item, ref}) =>{
+const ImageItem = ({item, list}) =>{
     return(
         <View > 
             <Image style={style.img} source={{ uri: 'file://'+item.src}}/>
             <View style={style.imageControls}>
-                <TouchableOpacity style={style.btn}><Text style={style.text}>{'<<'}</Text></TouchableOpacity>
-                <TouchableOpacity style={style.btn}><Text style={style.text}>{'>>'}</Text></TouchableOpacity>
-            </View>
-            
+                <TouchableOpacity style={style.btn} onPress={()=>{move('l',list)}}><Text style={style.text}>{'<<'}</Text></TouchableOpacity>
+                <TouchableOpacity style={style.btn} onPress={()=>{move('r',list)}}><Text style={style.text}>{'>>'}</Text></TouchableOpacity>
+            </View> 
         </View>
         
     );
 }
-const Item = ({item,refer})=>{
+const Item = ({item,list})=>{
     return(
         <View>
-            {item.type == 'image' ? <ImageItem item={item} refer={refer}/>: <VideoItem item={item} refer={refer}/> }  
+            {item.type == 'image' ? <ImageItem item={item} list={list}/>: <VideoItem item={item} list={list}/> }  
         </View>
     );
 }
 
 const App = ({route, navigation})=>{
+    const [currentIndex, setCurrentIndex] = useState(route.params.index);
     const media = useSelector((state)=> state.media);
     const flatListRef = useRef(null);
     const scroll = () => {
         flatListRef.current.scrollToIndex({animated:false, index: route.params.index}); 
-       }
+    }
     useFocusEffect(
        useCallback(() => {
         scroll();
        }, [])
     );
-    
+    const listData = {
+        ref :flatListRef,
+        currentIndex: currentIndex,
+        setCurrentIndex: setCurrentIndex,
+        length: media.length,
+    }
     return(
         <View style={style.container}>
             <FlatList
             data={media}
-            renderItem={({item})=><Item item={item} refer={flatListRef}/>}
+            renderItem={({item})=><Item item={item} list={listData} />}
             horizontal={true}
             ref={flatListRef}
             scrollEnabled={false}
