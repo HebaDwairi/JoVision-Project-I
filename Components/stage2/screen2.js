@@ -7,15 +7,33 @@ import {
     setUpdateIntervalForType,
     SensorTypes
   } from "react-native-sensors";
+const images = {
+    car: require('../../resources/car.png'),
+    sitting: require('../../resources/sitting.png'),
+    walking: require('../../resources/walking.png'),
+}
+const X = 0.5;
+const Y = 0.2;
 
 const App = ()=>{
     const [orientation, setOrientation] = useState({x:0,y:0,z:0});
     const [location, setLocation] = useState({coords:{}});
+    const [image, setImage] = useState(images.sitting);
     const rotation = useDeviceOrientation();
     
     async function loc (){  
         const location = await Location.getCurrentPositionAsync({});
         setLocation(location);
+        const speed = location.coords.speed;
+        if(speed > X){
+            setImage(images.car);
+        }
+        else if(speed > Y && speed < X){
+            setImage(images.walking);
+        }
+        else if(speed < Y){
+            setImage(images.sitting);
+        }
         console.log(location);
     }
     useEffect(()=>{
@@ -53,7 +71,7 @@ const App = ()=>{
                     <Text style={style.text}>Y: {orientation.y}</Text>
                     <Text style={style.text}>Z: {orientation.z}</Text>
             </View>
-            <Image source={{uri: 'file:///data/user/0/com.project1/files/guitar.jpg'}}
+            <Image source={image}
             style={{width:350, height:350, alignSelf:'center',margin:50,transform: [{rotate: rotation+'deg'}], borderRadius:20}}/>
         </ScrollView>
     );
