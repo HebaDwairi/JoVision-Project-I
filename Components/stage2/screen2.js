@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View,Text,StyleSheet} from 'react-native';
+import { View,Text,StyleSheet, Image,ScrollView} from 'react-native';
 import * as Location from 'expo-location';
+import { useDeviceOrientation } from 'react-native-expo-device-orientation';
 import {
     accelerometer,
     setUpdateIntervalForType,
@@ -8,30 +9,37 @@ import {
   } from "react-native-sensors";
 
 const App = ()=>{
-    const [orientation, setOrientation] = useState({});
+    const [orientation, setOrientation] = useState({x:0,y:0,z:0});
     const [location, setLocation] = useState({coords:{}});
-    setUpdateIntervalForType(SensorTypes.accelerometer, 500);
-    async function loc (){
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            console.log('could not get permission');
-            return;
-        }
+    const rotation = useDeviceOrientation();
+    
+    async function loc (){  
         const location = await Location.getCurrentPositionAsync({});
         setLocation(location);
+        console.log(location);
     }
     useEffect(()=>{
         const subscription = accelerometer.subscribe((data) =>{
             setOrientation(data); }    
         );
+        const requestLocationPermission = async ()=> {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('could not get permission');
+                return;
+            }
+        }
+        requestLocationPermission();
         loc();
+        setUpdateIntervalForType(SensorTypes.accelerometer, 500);
         setInterval(loc,10000);
         return () => {
             subscription.unsubscribe();
         };
     },[]);
+
     return(
-        <View style={style.container}> 
+        <ScrollView> 
             <Text style={style.text}>Location: </Text>
             <View style={style.sensorsContainer}>
                     <Text style={style.text}>Altitude: {location.coords.altitude}</Text>
@@ -45,7 +53,9 @@ const App = ()=>{
                     <Text style={style.text}>Y: {orientation.y}</Text>
                     <Text style={style.text}>Z: {orientation.z}</Text>
             </View>
-        </View>
+            <Image source={{uri: 'file:///data/user/0/com.project1/files/guitar.jpg'}}
+            style={{width:350, height:350, alignSelf:'center',margin:50,transform: [{rotate: rotation+'deg'}], borderRadius:20}}/>
+        </ScrollView>
     );
 }
 const style = StyleSheet.create({
@@ -54,6 +64,7 @@ const style = StyleSheet.create({
         backgroundColor:'#355c5c',
         padding:10,
         borderRadius:20,
+        alignSelf:'center'
     },
     container:{
         flex:1,
