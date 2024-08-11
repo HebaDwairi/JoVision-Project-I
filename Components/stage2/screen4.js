@@ -22,18 +22,33 @@ const move = (dir,list)=>{
 }
 
 const VideoItem = ({item, list}) =>{
+    const [paused, setPaused] = useState(false);
+    const [time, setTime] = useState(0);
+    const ref= useRef(null);
+    const forward = ()=>{
+        ref.current.seek(time+5);
+    }
+    const rewind = ()=>{
+        ref.current.seek(time-5);
+    }
+    const handleProgress = (vid)=>{
+        setTime(vid.currentTime);
+    }
     return(
         <View>
             <Video
             source={{ uri: 'file://'+item.src}}
-            controls={false}
+            controls={true}
             style={style.img}
+            paused={paused}
+            ref={ref}
+            onProgress={handleProgress}
             />
             <View style={style.imageControls}>
                 <TouchableOpacity style={style.btn} onPress={()=>{move('l',list)}}><Text style={style.text}>{'<<'}</Text></TouchableOpacity>
-                <TouchableOpacity style={style.btn}><Text style={style.text}>-5</Text></TouchableOpacity>
-                <TouchableOpacity style={style.btn}><Text style={style.text}>play</Text></TouchableOpacity>
-                <TouchableOpacity style={style.btn}><Text style={style.text}>+5</Text></TouchableOpacity>
+                <TouchableOpacity style={style.btn} onPress={rewind}><Text style={style.text}>-5</Text></TouchableOpacity>
+                <TouchableOpacity style={style.btn} onPress={()=>{setPaused(!paused)}}><Text style={style.text}>play</Text></TouchableOpacity>
+                <TouchableOpacity style={style.btn} onPress={forward}><Text style={style.text}>+5</Text></TouchableOpacity>
                 <TouchableOpacity style={style.btn} onPress={()=>{move('r',list)}}><Text style={style.text}>{'>>'}</Text></TouchableOpacity>
             </View>
         </View>
@@ -100,7 +115,7 @@ const App = ({route, navigation})=>{
 const style = StyleSheet.create({
     img:{
         width:392,
-        height:720,
+        height:705,
         alignSelf:'center',
         marginHorizontal:1,
     },
@@ -123,6 +138,7 @@ const style = StyleSheet.create({
         padding:10,
         borderRadius:20,
         bottom:5,
+        marginVertical:10,
     }
 });
 export default App;
